@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adamo Crew</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#f8f7f4;--surface:#ffffff;--surface2:#f1f0ec;--border:#e2e0d8;--border2:#ccc9be;
+    --text:#1a1a18;--text2:#6b6960;--text3:#9e9b92;
+    --swim:#1D9E75;--swim-bg:#E1F5EE;--swim-text:#085041;
+    --bike:#378ADD;--bike-bg:#E6F1FB;--bike-text:#042C53;
+    --run:#D85A30;--run-bg:#FAECE7;--run-text:#4A1B0C;
+    --track:#D4537E;--track-bg:#FBEAF0;--track-text:#4B1528;
+    --strength:#7F77DD;--strength-bg:#EEEDFE;--strength-text:#26215C;
+    --accent:#D85A30;
+  }
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh}
+  
+  /* NAV */
+  .nav{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;background:var(--surface);border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px;position:sticky;top:0;z-index:100}
+  .nav-brand{display:flex;align-items:center;gap:9px;font-size:15px;font-weight:600;color:var(--text)}
+  .logo{width:28px;height:28px;border-radius:7px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:white;font-size:10px;font-weight:700}
+  .tabs{display:flex;gap:2px;flex-wrap:wrap}
+  .tab{padding:6px 13px;font-size:12px;border-radius:7px;border:none;background:transparent;color:var(--text2);cursor:pointer;transition:all .15s;font-weight:500}
+  .tab.on{background:var(--surface2);color:var(--text)}
+  .tab:hover:not(.on){background:var(--surface2)}
+  .ava{width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;flex-shrink:0}
+  
+  /* LAYOUT */
+  .view{display:none;padding:20px;max-width:1200px;margin:0 auto}
+  .view.on{display:block}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+  @media(max-width:700px){.grid2,.grid3,.grid4{grid-template-columns:1fr!important}}
+  
+  /* METRIC CARDS */
+  .mcard{background:var(--surface2);border-radius:9px;padding:13px}
+  .mlabel{font-size:11px;color:var(--text2);margin-bottom:3px;font-weight:500}
+  .mval{font-size:22px;font-weight:700;color:var(--text)}
+  .msub{font-size:11px;color:var(--text3);margin-top:2px}
+  
+  /* SECTION TITLE */
+  .stitle{font-size:13px;font-weight:600;color:var(--text);margin-bottom:13px}
+  
+  /* WEEK GRID */
+  .week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:10px}
+  @media(max-width:700px){.week-grid{grid-template-columns:repeat(3,1fr)}}
+  .day-col{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;min-height:150px}
+  .day-col.today{border-color:var(--accent);border-width:2px}
+  .dh{padding:8px 9px;border-bottom:1px solid var(--border)}
+  .dname{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+  .dnum{font-size:17px;font-weight:700;color:var(--text);margin-top:2px}
+  .dnum.t{color:var(--accent)}
+  .dsess{padding:7px;display:flex;flex-direction:column;gap:5px}
+  .sp{border-radius:5px;padding:5px 7px;cursor:pointer;transition:opacity .15s}
+  .sp:hover{opacity:.8}
+  .stype{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;opacity:.7}
+  .sname{font-size:11px;font-weight:600;margin-top:1px}
+  .sdur{font-size:10px;opacity:.65;margin-top:1px}
+  .swim-s{background:var(--swim-bg);color:var(--swim-text)}
+  .bike-s{background:var(--bike-bg);color:var(--bike-text)}
+  .run-s{background:var(--run-bg);color:var(--run-text)}
+  .track-s{background:var(--track-bg);color:var(--track-text)}
+  .str-s{background:var(--strength-bg);color:var(--strength-text)}
+  .rest-s{color:var(--text3);font-size:11px;padding:8px 7px}
+  
+  /* INTERVAL TABLE */
+  .itbl{width:100%;border-collapse:collapse;font-size:12px}
+  .itbl th{text-align:left;padding:5px 8px;font-size:10px;color:var(--text2);font-weight:600;border-bottom:1px solid var(--border)}
+  .itbl td{padding:7px 8px;border-bottom:1px solid var(--border);color:var(--text)}
+  .itbl tr:last-child td{border-bottom:none}
+  .zb{padding:2px 6px;border-radius:4px;font-size:10px;font-weight:600}
+  .z1{background:var(--swim-bg);color:var(--swim-text)}.z2{background:var(--bike-bg);color:var(--bike-text)}.z3{background:#FAEEDA;color:#412402}.z4{background:var(--run-bg);color:var(--run-text)}.z5{background:var(--track-bg);color:var(--track-text)}
+  
+  /* BUTTONS */
+  .btn{padding:8px 16px;font-size:12px;border-radius:8px;border:1px solid var(--border2);background:var(--surface);color:var(--text);cursor:pointer;font-weight:500;transition:all .15s}
+  .btn:hover{background:var(--surface2)}
+  .btn-accent{padding:8px 16px;font-size:12px;border-radius:8px;border:none;background:var(--accent);color:white;cursor:pointer;font-weight:600;transition:opacity .15s}
+  .btn-accent:hover{opacity:.88}
+  .btn-sm{padding:5px 11px;font-size:11px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;transition:all .15s}
+  .btn-sm:hover{background:var(--surface2)}
+  
+  /* FORMS */
+  input,select,textarea{font-family:inherit;font-size:13px;color:var(--text);background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:8px 11px;width:100%;outline:none;transition:border .15s}
+  input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+  textarea{resize:vertical;min-height:72px}
+  label{font-size:11px;color:var(--text2);display:block;margin-bottom:4px;margin-top:10px;font-weight:500}
+  
+  /* PILLS */
+  .pill{display:inline-block;font-size:9px;padding:2px 7px;border-radius:4px;font-weight:700}
+  .pill-g{background:var(--swim-bg);color:var(--swim-text)}
+  .pill-b{background:var(--bike-bg);color:var(--bike-text)}
+  .pill-o{background:var(--run-bg);color:var(--run-text)}
+  .pill-p{background:var(--strength-bg);color:var(--strength-text)}
+  .pill-pk{background:var(--track-bg);color:var(--track-text)}
+  .pill-y{background:#FAEEDA;color:#412402}
+  
+  /* ATHLETE GRID */
+  .ath-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+  .ath-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;transition:border-color .15s}
+  .ath-card:hover{border-color:var(--border2)}
+  .ath-top{display:flex;align-items:center;gap:10px;margin-bottom:11px}
+  .ath-av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;flex-shrink:0}
+  .ath-name{font-size:13px;font-weight:600;color:var(--text)}
+  .ath-sub{font-size:11px;color:var(--text2);margin-top:1px}
+  .ath-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:9px}
+  .as{background:var(--surface2);border-radius:6px;padding:7px 8px}
+  .asl{font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;font-weight:600}
+  .asv{font-size:14px;font-weight:700;color:var(--text);margin-top:2px}
+  .dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-left:3px;vertical-align:middle}
+  
+  /* NOTES */
+  .rpe-row{display:flex;gap:4px;margin-top:4px}
+  .rpe-btn{flex:1;padding:6px 2px;font-size:11px;border-radius:5px;border:1px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;text-align:center;transition:all .15s;font-weight:500}
+  .rpe-btn.sel{border-color:var(--accent);background:var(--run-bg);color:var(--run-text);font-weight:700}
+  .note-item{padding:11px 0;border-bottom:1px solid var(--border)}
+  .note-item:last-child{border-bottom:none}
+  .note-who{font-size:12px;font-weight:600;color:var(--text)}
+  .note-date{font-size:11px;color:var(--text3);margin-left:5px}
+  .note-body{font-size:12px;color:var(--text2);margin-top:4px;line-height:1.55}
+  .note-tags{display:flex;gap:4px;margin-top:5px;flex-wrap:wrap}
+  
+  /* BARS */
+  .bar-bg{height:8px;background:var(--surface2);border-radius:5px;overflow:hidden;flex:1}
+  .bar-fill{height:8px;border-radius:5px}
+  .taper-wlabel{font-size:11px;color:var(--text2);display:flex;justify-content:space-between;margin-bottom:5px}
+  .taper-row{margin-bottom:13px}
+  
+  /* CAL */
+  .gcal-badge{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text2);padding:9px 12px;background:var(--surface2);border-radius:9px;margin-bottom:13px}
+  .gcal-dot{width:8px;height:8px;border-radius:50%;background:#1D9E75;flex-shrink:0}
+  .cal-item{display:flex;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);gap:10px}
+  .cal-item:last-child{border-bottom:none}
+  .cal-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+  .cal-title{font-size:12px;font-weight:600;color:var(--text)}
+  .cal-sub{font-size:11px;color:var(--text2);margin-top:1px}
+  .cal-time{font-size:11px;color:var(--text3);text-align:right;white-space:nowrap;margin-left:auto}
+  
+  /* AI */
+  .ai-bubble{background:var(--surface2);border-radius:10px;padding:13px 15px;font-size:13px;color:var(--text);line-height:1.6;margin-bottom:10px}
+  .ai-bubble.thinking{color:var(--text3);font-style:italic}
+  
+  /* SEP */
+  .sep{border:none;border-top:1px solid var(--border);margin:14px 0}
+  
+  /* SESS DETAIL */
+  #sess-detail{margin-top:12px;padding-top:13px;border-top:1px solid var(--border)}
+
+  /* TABLE SCROLL on small screens */
+  .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .itbl{min-width:420px}
+
+  /* MOBILE NAV */
+  @media(max-width:600px){
+    .nav{padding:8px 12px}
+    .tabs{order:3;width:100%;overflow-x:auto;flex-wrap:nowrap;padding-bottom:2px}
+    .tab{white-space:nowrap;padding:5px 10px;font-size:11px}
+    .nav-brand{font-size:13px}
+    .view{padding:12px}
+    .grid4{grid-template-columns:1fr 1fr!important}
+    .week-grid{grid-template-columns:repeat(4,1fr)!important}
+  }
+  @media(max-width:420px){
+    .week-grid{grid-template-columns:repeat(2,1fr)!important}
+  }
+
+  /* WEEK HEADER subtext */
+  .week-subtext{font-size:11px;color:var(--text3);margin-top:2px}
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <div class="nav-brand">
+    <div class="logo">AC</div>
+    Adamo Crew
+    <span class="pill pill-o" style="margin-left:2px">Beta</span>
+  </div>
+  <div class="tabs">
+    <button class="tab on" onclick="sw('plan')">Plan</button>
+    <button class="tab" onclick="sw('ai')">AI Generator</button>
+    <button class="tab" onclick="sw('athletes')">Athletes</button>
+    <button class="tab" onclick="sw('notes')">Notes & RPE</button>
+    <button class="tab" onclick="sw('load')">Load</button>
+    <button class="tab" onclick="sw('taper')">Taper</button>
+    <button class="tab" onclick="sw('cal')">Calendar</button>
+  </div>
+  <div class="ava">JC</div>
+</div>
+
+<!-- ======= PLAN ======= -->
+<div id="v-plan" class="view on">
+  <div class="grid4">
+    <div class="mcard"><div class="mlabel">Weekly TSS</div><div class="mval">468</div><div class="msub">Target 480</div></div>
+    <div class="mcard"><div class="mlabel">Total hours</div><div class="mval">11.5h</div><div class="msub">Swim 2h · Bike 6h · Run 3h</div></div>
+    <div class="mcard"><div class="mlabel">Phase</div><div class="mval">Build 2</div><div class="msub">Peak in 3 weeks</div></div>
+    <div class="mcard"><div class="mlabel">Race day</div><div class="mval">May 11</div><div class="msub">Los Cabos 70.3</div></div>
+  </div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+      <div>
+        <div class="stitle" style="margin:0" id="week-heading">Week 14 · Los Cabos build</div>
+        <div class="week-subtext" id="week-subtext"></div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn-sm">← W13</button>
+        <button class="btn-sm">W15 →</button>
+        <button class="btn-sm" onclick="sw('ai')">+ AI session</button>
+        <button class="btn-sm" onclick="sw('cal')">Push to calendar</button>
+      </div>
+    </div>
+    <div class="week-grid" id="wg"></div>
+    <div id="sess-detail" style="display:none">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div id="sd-title" style="font-size:13px;font-weight:600;color:var(--text)"></div>
+        <button class="btn-sm" onclick="document.getElementById('sess-detail').style.display='none'">close</button>
+      </div>
+      <div class="tbl-wrap"><table class="itbl"><thead id="sd-head"></thead><tbody id="sd-body"></tbody></table></div>
+    </div>
+  </div>
+</div>
+
+<!-- ======= AI GENERATOR ======= -->
+<div id="v-ai" class="view">
+  <div class="grid2">
+    <div class="card">
+      <div class="stitle">AI workout generator</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div><label>Sport</label><select id="ai-sport"><option>Swim</option><option>Bike</option><option selected>Run</option><option>Track</option><option>Strength</option><option>Brick</option><option>OWS</option></select></div>
+        <div><label>Duration</label><select id="ai-dur"><option>30 min</option><option>45 min</option><option selected>1 hour</option><option>1h 30min</option><option>2 hours</option><option>3 hours</option><option>3h 30min</option></select></div>
+        <div><label>Goal</label><select id="ai-goal"><option>Aerobic base</option><option selected>Threshold / tempo</option><option>VO2max</option><option>Speed endurance</option><option>Recovery</option><option>Race simulation</option><option>Brick transition</option></select></div>
+        <div><label>Athlete</label><select id="ai-ath"><option>Jordi C. (me)</option><option>Lucrecia B.</option><option>Ana M.</option><option>Carlos R.</option><option>Sofía V.</option><option>Miguel A.</option></select></div>
+      </div>
+      <label>Context / coaching notes (optional)</label>
+      <textarea id="ai-ctx" placeholder="e.g. heat race prep, left hip niggle, focus on cadence, OWS first session back..."></textarea>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="btn-accent" style="flex:1" onclick="genWorkout()">Generate with Claude AI</button>
+        <button class="btn" onclick="clearAI()">Clear</button>
+      </div>
+    </div>
+    <div class="card" style="min-height:300px">
+      <div class="stitle">Generated session</div>
+      <div id="ai-output"><div class="ai-bubble thinking">Select sport, duration, goal and athlete — Claude will generate a structured session with intervals, zones, and pacing targets.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ======= ATHLETES ======= -->
+<div id="v-athletes" class="view">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+    <div style="font-size:15px;font-weight:600">Adamo Crew · 6 athletes</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn">Filter</button>
+      <button class="btn-accent" onclick="alert('In the full web app this opens a form to add an athlete with email, sport, FTP/paces, and auto-creates their TrainingPeaks/Garmin sync.')">+ Add athlete</button>
+    </div>
+  </div>
+  <div class="ath-grid" id="ath-grid"></div>
+</div>
+
+<!-- ======= NOTES & RPE ======= -->
+<div id="v-notes" class="view">
+  <div class="grid2">
+    <div class="card">
+      <div class="stitle">Log post-workout feedback</div>
+      <label>Athlete</label>
+      <select id="note-ath"><option>Jordi C. (me)</option><option>Lucrecia B.</option><option>Ana M.</option><option>Carlos R.</option><option>Sofía V.</option><option>Miguel A.</option></select>
+      <label>Session</label>
+      <select id="note-sess">
+        <option>Mon — OWS base</option>
+        <option>Mon — Core & mobility</option>
+        <option>Tue — Bike tempo intervals</option>
+        <option>Wed — Easy run</option>
+        <option>Wed — Pool technique</option>
+        <option>Thu — Track 800m speed</option>
+        <option>Fri — OWS Valle de Bravo</option>
+        <option>Sat — Long ride + brick</option>
+        <option>Sun — Long run (heat)</option>
+      </select>
+      <label>RPE (1 = very easy · 10 = max effort)</label>
+      <div class="rpe-row" id="rpe-row"></div>
+      <label>Coaching notes</label>
+      <textarea id="note-body" placeholder="How did it feel? Pacing, form, any issues, key observations, follow-up actions..."></textarea>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="btn-accent" style="flex:1" onclick="addNote()">Save note</button>
+        <button class="btn" onclick="aiAnalyzeNotes()">AI analysis</button>
+      </div>
+      <div id="ai-notes-output" style="margin-top:10px"></div>
+    </div>
+    <div class="card">
+      <div class="stitle">Recent feedback log</div>
+      <div id="notes-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ======= LOAD ======= -->
+<div id="v-load" class="view">
+  <div class="grid4">
+    <div class="mcard"><div class="mlabel">CTL (fitness)</div><div class="mval">72</div><div class="msub">+4 vs last week</div></div>
+    <div class="mcard"><div class="mlabel">ATL (fatigue)</div><div class="mval">88</div><div class="msub">High load week</div></div>
+    <div class="mcard"><div class="mlabel">TSB (form)</div><div class="mval">−16</div><div class="msub">Building fitness</div></div>
+    <div class="mcard"><div class="mlabel">Weeks to race</div><div class="mval">6</div><div class="msub">Los Cabos 70.3</div></div>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <div class="stitle">Weekly TSS · 8-week history</div>
+      <div id="load-bars" style="display:flex;align-items:flex-end;gap:5px;height:80px;margin-bottom:10px"></div>
+      <div style="display:flex;gap:12px">
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2)"><div style="width:10px;height:10px;border-radius:2px;background:var(--accent)"></div>This week</div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2)"><div style="width:10px;height:10px;border-radius:2px;background:var(--accent);opacity:.3"></div>Past</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="stitle">Sport distribution · W14</div>
+      <div id="sport-dist"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="stitle">AI load analysis</div>
+    <div id="load-ai-output"><div class="ai-bubble thinking">Click below to get a Claude-powered analysis of your load trends and taper recommendations.</div></div>
+    <button class="btn-accent" style="margin-top:10px" onclick="aiLoadAnalysis()">Analyze load for Los Cabos</button>
+  </div>
+</div>
+
+<!-- ======= TAPER ======= -->
+<div id="v-taper" class="view">
+  <div class="grid3">
+    <div class="mcard"><div class="mlabel">Race date</div><div class="mval">May 11</div><div class="msub">Los Cabos 70.3</div></div>
+    <div class="mcard"><div class="mlabel">Weeks out</div><div class="mval">6</div><div class="msub">2 peak · 2 taper · race week</div></div>
+    <div class="mcard"><div class="mlabel">Taper starts</div><div class="mval">Apr 27</div><div class="msub">2 weeks out from race</div></div>
+  </div>
+  <div class="card">
+    <div class="stitle">Load progression to race day</div>
+    <div id="taper-bars"></div>
+    <div style="font-size:11px;color:var(--text3);margin-top:4px">TSS targets per week. Colors: blue = build, orange = peak, green = taper, pink = race week.</div>
+  </div>
+  <div class="card">
+    <div class="stitle">Week-by-week coaching focus</div>
+    <div id="taper-focus"></div>
+  </div>
+  <button class="btn-accent" style="margin-top:4px;width:100%" onclick="aiTaperPlan()">Build AI detailed taper plan</button>
+  <div id="taper-ai-output" style="margin-top:12px"></div>
+</div>
+
+<!-- ======= CALENDAR ======= -->
+<div id="v-cal" class="view">
+  <div class="gcal-badge">
+    <div class="gcal-dot"></div>
+    Google Calendar connected · Adamo Crew coaching calendar
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <div class="stitle">Push sessions to Google Calendar</div>
+      <label>Athlete</label>
+      <select id="cal-ath"><option>All athletes</option><option>Jordi C. (me)</option><option>Lucrecia B.</option><option>Ana M.</option><option>Carlos R.</option><option>Sofía V.</option><option>Miguel A.</option></select>
+      <label>Training week</label>
+      <select id="cal-week"><option selected>Week 14 (Apr 1–7)</option><option>Week 15 (Apr 8–14)</option><option>Week 16 (Apr 15–21)</option><option>Week 17 (Apr 22–28) — taper starts</option></select>
+      <label>Sports to include</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px" id="cal-sports"></div>
+      <div style="display:flex;gap:8px;margin-top:14px">
+        <button class="btn-accent" style="flex:1" onclick="pushCal()">Push to Google Calendar</button>
+        <button class="btn" onclick="pushFullBuild()">Full build plan</button>
+      </div>
+      <div id="cal-feedback" style="margin-top:10px"></div>
+    </div>
+    <div class="card">
+      <div class="stitle">Upcoming sessions</div>
+      <div id="cal-list"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_URL='/.netlify/functions/claude';
+const MODEL='claude-sonnet-4-20250514';
+
+async function callClaude(prompt,systemPrompt=''){
+  const messages=[{role:'user',content:prompt}];
+  const body={model:MODEL,max_tokens:1000,messages};
+  if(systemPrompt) body.system=systemPrompt;
+  const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  if(!res.ok){const e=await res.text();throw new Error('API '+res.status+': '+e);}
+  const data=await res.json();
+  if(data.error)throw new Error(data.error.message||JSON.stringify(data.error));
+  return data.content.map(b=>b.text||'').join('');
+}
+
+// -------- PLAN --------
+const sessions=[
+  {day:0,type:'swim',cls:'swim-s',label:'OWS base',dur:'45 min',tss:35,intervals:[{set:'Warm-up',reps:'1×400m',pace:'easy',zone:'z1'},{set:'Main set',reps:'4×200m',pace:'1:55/100m',zone:'z3'},{set:'Pull set',reps:'4×100m',pace:'1:50/100m',zone:'z3'},{set:'Cool-down',reps:'200m',pace:'easy',zone:'z1'}]},
+  {day:0,type:'strength',cls:'str-s',label:'Core & mobility',dur:'30 min',tss:20,intervals:[{set:'Plank circuit',reps:'3×60s',pace:'—',zone:'z1'},{set:'Single-leg',reps:'3×12 each',pace:'—',zone:'z2'},{set:'Hip flexor',reps:'2×90s',pace:'—',zone:'z1'}]},
+  {day:1,type:'bike',cls:'bike-s',label:'Tempo intervals',dur:'1h 30min',tss:90,intervals:[{set:'Warm-up',reps:'20 min',pace:'<180w',zone:'z1'},{set:'Threshold',reps:'3×12 min',pace:'215–220w',zone:'z4'},{set:'Recovery',reps:'5 min between',pace:'<160w',zone:'z1'},{set:'Cool-down',reps:'15 min',pace:'<170w',zone:'z1'}]},
+  {day:2,type:'run',cls:'run-s',label:'Easy aerobic',dur:'50 min',tss:45,intervals:[{set:'Easy run',reps:'50 min continuous',pace:'5:00–5:20/km',zone:'z2'}]},
+  {day:2,type:'swim',cls:'swim-s',label:'Pool technique',dur:'1h',tss:40,intervals:[{set:'Drills',reps:'6×50m',pace:'form focus',zone:'z1'},{set:'Pace work',reps:'10×100m',pace:'1:52/100m',zone:'z3'}]},
+  {day:3,type:'track',cls:'track-s',label:'800m speed endurance',dur:'1h 10min',tss:75,intervals:[{set:'Warm-up',reps:'2km easy',pace:'5:00/km',zone:'z1'},{set:'600m reps',reps:'4×600m',pace:'2:30–2:35',zone:'z5'},{set:'400m float',reps:'4×400m',pace:'1:50–1:55',zone:'z4'},{set:'Cool-down',reps:'1.5km',pace:'easy',zone:'z1'}]},
+  {day:4,type:'swim',cls:'swim-s',label:'OWS — Valle de Bravo',dur:'40 min',tss:30,intervals:[{set:'Steady OWS',reps:'2×750m',pace:'1:55/100m',zone:'z2'},{set:'Race pace',reps:'2×250m',pace:'1:50/100m',zone:'z3'}]},
+  {day:5,type:'bike',cls:'bike-s',label:'Long ride + brick',dur:'3h 30min',tss:155,intervals:[{set:'Aerobic base',reps:'90 min',pace:'185–200w',zone:'z2'},{set:'Race pace',reps:'60 min',pace:'215–220w',zone:'z3'},{set:'Aerobic',reps:'40 min',pace:'185w',zone:'z2'},{set:'Brick run',reps:'20 min',pace:'4:20–4:30/km',zone:'z3'}]},
+  {day:6,type:'run',cls:'run-s',label:'Long run (heat)',dur:'1h 20min',tss:70,intervals:[{set:'Warm-up',reps:'15 min',pace:'5:20/km',zone:'z1'},{set:'Steady',reps:'50 min',pace:'4:40–5:00/km',zone:'z2'},{set:'Cool-down',reps:'15 min',pace:'easy',zone:'z1'}]},
+];
+// Dynamic week: calculate Mon–Sun of the current week
+const _now2=new Date();
+const _mon=new Date(_now2);
+_mon.setDate(_now2.getDate()-(_now2.getDay()===0?6:_now2.getDay()-1));
+const DAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const DATES=DAYS.map((_,i)=>{const d=new Date(_mon);d.setDate(_mon.getDate()+i);return d.getDate();});
+const MONTHS_DAYS=DAYS.map((_,i)=>{const d=new Date(_mon);d.setDate(_mon.getDate()+i);return MONTHS[d.getMonth()]+' '+d.getDate();});
+const sunDate=new Date(_mon);sunDate.setDate(_mon.getDate()+6);
+const weekRange=MONTHS[_mon.getMonth()]+' '+_mon.getDate()+' – '+MONTHS[sunDate.getMonth()]+' '+sunDate.getDate();
+// Set week heading dynamically
+document.addEventListener('DOMContentLoaded',()=>{
+  const wh=document.getElementById('week-heading');
+  const ws=document.getElementById('week-subtext');
+  if(wh) wh.textContent='Los Cabos build · current week';
+  if(ws) ws.textContent=weekRange+' · 6 weeks to race';
+});
+// Dynamic today: find which day of the current week matches today
+const _now=new Date();
+const _dow=_now.getDay()===0?6:_now.getDay()-1; // 0=Mon...6=Sun
+const TODAY=_dow;
+
+function buildPlan(){
+  const g=document.getElementById('wg');
+  DAYS.forEach((d,i)=>{
+    const ss=sessions.filter(s=>s.day===i);
+    const col=document.createElement('div');
+    col.className='day-col'+(i===TODAY?' today':'');
+    let h=`<div class="dh"><div class="dname">${d}</div><div class="dnum${i===TODAY?' t':''}">${MONTHS_DAYS[i]}</div></div><div class="dsess">`;
+    if(!ss.length) h+=`<div class="rest-s">Rest</div>`;
+    else ss.forEach((s,si)=>{h+=`<div class="sp ${s.cls}" onclick="showSess(${i},${si})"><div class="stype">${s.type}</div><div class="sname">${s.label}</div><div class="sdur">${s.dur}</div></div>`;});
+    h+='</div>';
+    col.innerHTML=h;
+    g.appendChild(col);
+  });
+}
+
+function showSess(di,si){
+  const ss=sessions.filter(s=>s.day===di);const s=ss[si];
+  document.getElementById('sd-title').textContent=`${s.label} · ${s.dur} · ${s.tss} TSS`;
+  document.getElementById('sd-head').innerHTML='<tr><th>Set</th><th>Reps / distance</th><th>Pace / power</th><th>Zone</th><th>Rest</th></tr>';
+  document.getElementById('sd-body').innerHTML=s.intervals.map(r=>`<tr><td>${r.set}</td><td>${r.reps}</td><td>${r.pace}</td><td><span class="zb ${r.zone}">${r.zone.toUpperCase()}</span></td><td>${r.rest||"—"}</td></tr>`).join('');
+  const d=document.getElementById('sess-detail');d.style.display='block';d.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// -------- AI GENERATOR --------
+let aiLoading=false;
+async function genWorkout(){
+  if(aiLoading)return;
+  aiLoading=true;
+  const sport=document.getElementById('ai-sport').value;
+  const dur=document.getElementById('ai-dur').value;
+  const goal=document.getElementById('ai-goal').value;
+  const ath=document.getElementById('ai-ath').value;
+  const ctx=document.getElementById('ai-ctx').value;
+  const out=document.getElementById('ai-output');
+  out.innerHTML='<div class="ai-bubble thinking">Generating structured workout with Claude AI...</div>';
+  try{
+    const prompt=`You are an expert triathlon and multisport coach. Generate a structured ${sport} workout:
+Athlete: ${ath}
+Duration: ${dur}
+Goal: ${goal}
+${ctx?'Coaching context: '+ctx:''}
+Athlete background: competitive age-group triathlete, 70.3 focus, FTP ~240w, run threshold ~4:10/km, 1500m swim ~25 min pool.
+
+Return ONLY a JSON object, no markdown, no backticks:
+{"title":"short workout name","summary":"2-sentence coaching rationale","tss":number,"keyMetric":"main target (e.g. 215-220w or 4:15/km)","intervals":[{"set":"name","reps":"reps or distance","pace":"pace or power","zone":"z1|z2|z3|z4|z5","rest":"rest or —"}]}`;
+    const text=await callClaude(prompt);
+    const clean=text.replace(/```json|```/g,'').trim();
+    const w=JSON.parse(clean);
+    out.innerHTML=`
+      <div style="margin-bottom:12px">
+        <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:5px">${w.title}</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.55;margin-bottom:8px">${w.summary}</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <span class="pill pill-o">${sport}</span>
+          <span class="pill pill-b">${dur}</span>
+          <span class="pill pill-g">${w.tss} TSS</span>
+          <span class="pill pill-y">Target: ${w.keyMetric}</span>
+        </div>
+      </div>
+      <table class="itbl">
+        <thead><tr><th>Set</th><th>Reps / distance</th><th>Pace / power</th><th>Zone</th><th>Rest</th></tr></thead>
+        <tbody>${w.intervals.map(r=>`<tr><td>${r.set}</td><td>${r.reps}</td><td>${r.pace}</td><td><span class="zb ${r.zone}">${r.zone.toUpperCase()}</span></td><td>${r.rest}</td></tr>`).join('')}</tbody>
+      </table>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="btn-accent" onclick="alert('In the full app this adds the session to the selected week in the training plan.')">Add to plan</button>
+        <button class="btn" onclick="sw('cal')">Push to calendar</button>
+        <button class="btn" onclick="genWorkout()">Regenerate</button>
+      </div>`;
+  }catch(e){out.innerHTML='<div class="ai-bubble thinking">Could not generate. Check console or try again.</div>';}
+  aiLoading=false;
+}
+function clearAI(){document.getElementById('ai-output').innerHTML='<div class="ai-bubble thinking">Select sport, duration, goal and athlete — Claude will generate a structured session.</div>';}
+
+// -------- ATHLETES --------
+const athletes=[
+  {name:'Jordi C.',ini:'JC',color:'#D85A30',tag:'Coach · Age grouper · 70.3',ctl:72,tss:468,status:'on',sports:['Tri','Track']},
+  {name:'Lucrecia B.',ini:'LB',color:'#1D9E75',tag:'Track · 800m–5km specialist',ctl:55,tss:312,status:'on',sports:['Track','Run']},
+  {name:'Ana M.',ini:'AM',color:'#378ADD',tag:'Triathlete · 70.3 distance',ctl:61,tss:398,status:'on',sports:['Tri']},
+  {name:'Carlos R.',ini:'CR',color:'#7F77DD',tag:'Cyclist · Road racing',ctl:48,tss:280,status:'off',sports:['Bike']},
+  {name:'Sofía V.',ini:'SV',color:'#D4537E',tag:'Runner · Marathon & half',ctl:58,tss:340,status:'on',sports:['Run']},
+  {name:'Miguel A.',ini:'MA',color:'#888780',tag:'Triathlete · Sprint distance',ctl:41,tss:220,status:'off',sports:['Tri','Swim']},
+];
+const sCls={Tri:'pill-b',Track:'pill-pk',Run:'pill-o',Bike:'pill-b',Swim:'pill-g'};
+
+function buildAthletes(){
+  const g=document.getElementById('ath-grid');
+  athletes.forEach(a=>{
+    const c=document.createElement('div');c.className='ath-card';
+    c.innerHTML=`<div class="ath-top"><div class="ath-av" style="background:${a.color}">${a.ini}</div><div><div class="ath-name">${a.name}<span class="dot" style="background:${a.status==='on'?'#1D9E75':'#888780'}"></span></div><div class="ath-sub">${a.tag}</div></div></div>
+    <div class="ath-stats"><div class="as"><div class="asl">CTL</div><div class="asv">${a.ctl}</div></div><div class="as"><div class="asl">TSS/wk</div><div class="asv">${a.tss}</div></div><div class="as"><div class="asl">Status</div><div class="asv" style="font-size:11px;color:${a.status==='on'?'#1D9E75':'#888780'}">${a.status==='on'?'Active':'Rest wk'}</div></div></div>
+    <div style="display:flex;gap:4px;flex-wrap:wrap">${a.sports.map(s=>`<span class="pill ${sCls[s]||'pill-g'}">${s}</span>`).join('')}</div>`;
+    c.addEventListener('click',()=>alert(`In the full app, clicking ${a.name} opens their full training plan, session history, and performance metrics.`));
+    g.appendChild(c);
+  });
+}
+
+// -------- NOTES & RPE --------
+let selRPE=null;
+const notes=[
+  {who:'Jordi C.',date:'Apr 1',sess:'Bike tempo',rpe:8,body:'Legs heavy early, came around after 30 min. Hit all 3 threshold intervals at 217–219w. Left hip fine throughout.',tags:['bike','threshold','hip-ok']},
+  {who:'Lucrecia B.',date:'Mar 31',sess:'Track 600m reps',rpe:9,body:'Strong session. 600s at 2:28–2:31. Asked for more. Reminded her to save it for race simulation next week.',tags:['track','speed','LB']},
+  {who:'Ana M.',date:'Mar 30',sess:'OWS Valle de Bravo',rpe:6,body:'First OWS in 3 weeks. Sighting improved significantly. Breathing labored first 400m, settled well after.',tags:['swim','OWS','AM']},
+  {who:'Jordi C.',date:'Mar 29',sess:'Long run (heat)',rpe:7,body:'31°C. Held 4:48/km for main set. HR crept up last 20 min. Confirms need for heat adaptation.',tags:['run','heat','pace-check']},
+];
+
+function buildNotes(){
+  const r=document.getElementById('rpe-row');
+  for(let i=1;i<=10;i++){
+    const b=document.createElement('button');b.className='rpe-btn';b.textContent=i;
+    b.onclick=()=>{selRPE=i;document.querySelectorAll('.rpe-btn').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');};
+    r.appendChild(b);
+  }
+  renderNotes();
+}
+
+function renderNotes(){
+  document.getElementById('notes-list').innerHTML=notes.slice(0,6).map(n=>`<div class="note-item"><div><span class="note-who">${n.who}</span><span class="note-date">${n.date} · ${n.sess} · RPE <strong>${n.rpe}</strong>/10</span></div><div class="note-body">${n.body}</div><div class="note-tags">${n.tags.map(t=>`<span class="pill pill-g">${t}</span>`).join('')}</div></div>`).join('');
+}
+
+function addNote(){
+  const who=document.getElementById('note-ath').value.replace(' (me)','');
+  const sess=document.getElementById('note-sess').value.split('—')[1]?.trim()||'Session';
+  const body=document.getElementById('note-body').value.trim();
+  if(!body){alert('Add some notes before saving.');return;}
+  const today=MONTHS[_now2.getMonth()]+' '+_now2.getDate();
+  notes.unshift({who,date:today,sess,rpe:selRPE||'?',body,tags:['new']});
+  document.getElementById('note-body').value='';
+  selRPE=null;document.querySelectorAll('.rpe-btn').forEach(x=>x.classList.remove('sel'));
+  renderNotes();
+}
+
+async function aiAnalyzeNotes(){
+  const out=document.getElementById('ai-notes-output');
+  out.innerHTML='<div class="ai-bubble thinking">Analyzing recent athlete feedback...</div>';
+  try{
+    const notesSummary=notes.slice(0,5).map(n=>`${n.who} | ${n.sess} | RPE ${n.rpe} | ${n.body}`).join('\n');
+    const text=await callClaude(`You are a triathlon coach reviewing recent athlete session notes. Analyze these and give 3-4 bullet points of key observations, concerns, and recommended actions. Be concise and coach-like.\n\nNotes:\n${notesSummary}`);
+    out.innerHTML=`<div class="ai-bubble">${text.replace(/\n/g,'<br>')}</div>`;
+  }catch(e){out.innerHTML='<div class="ai-bubble thinking">Analysis failed. Try again.</div>';}
+}
+
+// -------- LOAD --------
+const weekTSS=[{w:'W7',v:340},{w:'W8',v:390},{w:'W9',v:280},{w:'W10',v:420},{w:'W11',v:370},{w:'W12',v:450},{w:'W13',v:410},{w:'W14',v:468}];
+
+function buildLoad(){
+  const c=document.getElementById('load-bars');
+  const mx=Math.max(...weekTSS.map(x=>x.v));
+  weekTSS.forEach((w,i)=>{
+    const p=Math.round(w.v/mx*100);const isCur=i===weekTSS.length-1;
+    const d=document.createElement('div');d.style.cssText='flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;height:100%';
+    d.innerHTML=`<div style="flex:1;display:flex;align-items:flex-end;width:100%"><div style="height:${p}%;width:100%;background:var(--accent);opacity:${isCur?1:.3};border-radius:3px 3px 0 0"></div></div><div style="font-size:9px;color:var(--text3)">${w.w}</div>`;
+    c.appendChild(d);
+  });
+  const sports=[{l:'Bike',v:155,c:'#378ADD'},{l:'Track',v:75,c:'#D4537E'},{l:'Run',v:70,c:'#D85A30'},{l:'Swim',v:105,c:'#1D9E75'},{l:'Strength',v:20,c:'#7F77DD'}];
+  const tot=sports.reduce((a,x)=>a+x.v,0);
+  document.getElementById('sport-dist').innerHTML=sports.map(s=>{const p=Math.round(s.v/tot*100);return`<div style="display:flex;align-items:center;gap:9px;margin-bottom:8px"><div style="font-size:11px;color:var(--text2);width:60px">${s.l}</div><div class="bar-bg"><div class="bar-fill" style="width:${p}%;background:${s.c}"></div></div><div style="font-size:10px;color:var(--text3);width:28px;text-align:right">${p}%</div></div>`;}).join('');
+}
+
+async function aiLoadAnalysis(){
+  const out=document.getElementById('load-ai-output');
+  out.innerHTML='<div class="ai-bubble thinking">Analyzing load data and taper requirements...</div>';
+  try{
+    const text=await callClaude(`You are an expert triathlon coach. Analyze this 8-week training load for a 70.3 athlete racing Los Cabos on May 11:
+Weekly TSS: W7:340, W8:390, W9:280(recovery), W10:420, W11:370, W12:450, W13:410, W14:468 (current)
+CTL:72, ATL:88, TSB:-16
+Sports: bike-heaviest, then swim/run/track/strength
+Race is 6 weeks away.
+Give 4-5 specific, actionable coaching recommendations about load management and taper timing. Be direct and coach-like.`);
+    out.innerHTML=`<div class="ai-bubble">${text.replace(/\n/g,'<br>')}</div>`;
+  }catch(e){out.innerHTML='<div class="ai-bubble thinking">Analysis failed. Try again.</div>';}
+}
+
+// -------- TAPER --------
+const taperWeeks=[
+  {label:'W14 · Apr 1–7',tss:480,type:'build',color:'#378ADD',badge:'pill-b',focus:'Last big week. Long ride + brick. Hit 480 TSS target. Absorb the load.'},
+  {label:'W15 · Apr 8–14',tss:500,type:'peak',color:'#D85A30',badge:'pill-o',focus:'Peak week. Race simulation. High intensity, higher volume. Key: Saturday race-sim brick.'},
+  {label:'W16 · Apr 15–21',tss:490,type:'peak',color:'#D85A30',badge:'pill-o',focus:'Second peak. Long OWS in Valle de Bravo. Brick with race-pace run in heat.'},
+  {label:'W17 · Apr 22–28',tss:360,type:'taper',color:'#1D9E75',badge:'pill-g',focus:'Taper begins. Reduce volume 25%. Keep short intensity. Legs should feel slightly heavy still.'},
+  {label:'W18 · Apr 29–May 4',tss:220,type:'taper',color:'#1D9E75',badge:'pill-g',focus:'Deep taper. Short sharp sessions only. Freshness is the goal. No heroics.'},
+  {label:'Race week · May 5–11',tss:95,type:'race',color:'#D4537E',badge:'pill-pk',focus:'Mon: short brick. Tue: easy spin + strides. Wed: rest. Thu: easy 20 min each. Fri: rest. Sat: shakeout + check-in. Sun: RACE.'},
+];
+
+function buildTaper(){
+  const mx=Math.max(...taperWeeks.map(w=>w.tss));
+  document.getElementById('taper-bars').innerHTML=taperWeeks.map(w=>{const p=Math.round(w.tss/mx*100);return`<div class="taper-row"><div class="taper-wlabel"><span>${w.label}</span><span style="font-weight:600">${w.tss} TSS</span></div><div class="bar-bg" style="height:10px"><div class="bar-fill" style="width:${p}%;background:${w.color};height:10px"></div></div></div>`;}).join('');
+  document.getElementById('taper-focus').innerHTML=taperWeeks.map(w=>`<div style="display:flex;align-items:flex-start;gap:9px;padding:9px 0;border-bottom:1px solid var(--border)"><span class="pill ${w.badge}" style="flex-shrink:0;margin-top:2px">${w.type}</span><div style="font-size:12px;color:var(--text2);line-height:1.55">${w.focus}</div></div>`).join('');
+}
+
+async function aiTaperPlan(){
+  const out=document.getElementById('taper-ai-output');
+  out.innerHTML='<div class="ai-bubble thinking">Building your personalized taper plan for Los Cabos...</div>';
+  try{
+    const text=await callClaude(`You are an expert triathlon coach. Build a detailed 2-week taper plan (Apr 27 – May 10) for a 70.3 athlete racing Los Cabos May 11. 
+Athlete profile: CTL 72, FTP ~240w, run threshold 4:10/km, swim 1:52/100m pool. Known heat (30°C+) at race venue. Left hip manageable. 
+Format as daily sessions for the 2 taper weeks. Be specific with durations, intensities, and coaching cues. Keep it practical.`);
+    out.innerHTML=`<div class="ai-bubble">${text.replace(/\n/g,'<br>')}</div>`;
+  }catch(e){out.innerHTML='<div class="ai-bubble thinking">Failed. Try again.</div>';}
+}
+
+// -------- CALENDAR --------
+const CAL_SPORTS=['Swim','Bike','Run','Track','Strength'];
+const calSel=new Set(CAL_SPORTS);
+
+function buildCal(){
+  const c=document.getElementById('cal-sports');
+  CAL_SPORTS.forEach(s=>{
+    const b=document.createElement('button');b.className='btn-sm';b.textContent=s;
+    if(calSel.has(s))b.style.background='var(--surface2)';
+    b.onclick=()=>{if(calSel.has(s)){calSel.delete(s);b.style.background='';}else{calSel.add(s);b.style.background='var(--surface2)';}};
+    c.appendChild(b);
+  });
+  const items=[
+    {color:'#378ADD',title:'Bike tempo intervals',sub:'Jordi C.',time:'Tue Apr 1 · 6:00 AM · 1h 30m'},
+    {color:'#1D9E75',title:'Pool technique',sub:'Ana M. · Jordi C.',time:'Wed Apr 2 · 7:00 AM · 1h'},
+    {color:'#D4537E',title:'Track 800m speed endurance',sub:'Lucrecia B. · Jordi C.',time:'Thu Apr 3 · 6:30 AM · 1h 10m'},
+    {color:'#1D9E75',title:'OWS — Valle de Bravo',sub:'All athletes',time:'Fri Apr 4 · 7:00 AM · 40m'},
+    {color:'#378ADD',title:'Long ride + brick run',sub:'Jordi C.',time:'Sat Apr 5 · 5:45 AM · 3h 30m'},
+    {color:'#D85A30',title:'Long run in heat',sub:'Sofía V. · Jordi C.',time:'Sun Apr 6 · 6:00 AM · 1h 20m'},
+  ];
+  document.getElementById('cal-list').innerHTML=items.map(e=>`<div class="cal-item"><div class="cal-dot" style="background:${e.color}"></div><div><div class="cal-title">${e.title}</div><div class="cal-sub">${e.sub}</div></div><div class="cal-time">${e.time.split('·').slice(1).join('·').trim()}</div></div>`).join('');
+}
+
+function pushCal(){
+  const fb=document.getElementById('cal-feedback');
+  const ath=document.getElementById('cal-ath').value;
+  const wk=document.getElementById('cal-week').value;
+  fb.innerHTML='<div class="ai-bubble thinking">Pushing sessions to Google Calendar...</div>';
+  setTimeout(()=>{fb.innerHTML=`<div class="ai-bubble" style="border-left:3px solid #1D9E75;padding-left:12px"><strong>Done.</strong> ${calSel.size} sport types pushed to Google Calendar for <strong>${ath}</strong> · ${wk}. Athlete calendar invites sent where emails are on file.</div>`;},1600);
+}
+
+function pushFullBuild(){
+  const fb=document.getElementById('cal-feedback');
+  fb.innerHTML='<div class="ai-bubble thinking">Generating full Los Cabos build plan and pushing all 6 weeks to calendar...</div>';
+  setTimeout(()=>{fb.innerHTML=`<div class="ai-bubble" style="border-left:3px solid #1D9E75;padding-left:12px"><strong>Full build pushed.</strong> 6 weeks (W14–Race week) added to Adamo Crew calendar. Peak weeks highlighted in orange. Taper weeks in green.</div>`;},2200);
+}
+
+// -------- NAV --------
+function sw(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('v-'+id).classList.add('on');
+  const map={plan:0,ai:1,athletes:2,notes:3,load:4,taper:5,cal:6};
+  document.querySelectorAll('.tab')[map[id]].classList.add('on');
+  window.scrollTo(0,0);
+}
+
+buildPlan();buildAthletes();buildNotes();buildLoad();buildTaper();buildCal();
+</script>
+</body>
+</html>
