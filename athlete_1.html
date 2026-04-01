@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adamo Crew · My Plan</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f8f7f4;--surface:#fff;--surface2:#f1f0ec;--border:#e2e0d8;--border2:#ccc9be;
+  --text:#1a1a18;--text2:#6b6960;--text3:#9e9b92;
+  --swim-bg:#E1F5EE;--swim-text:#085041;
+  --bike-bg:#E6F1FB;--bike-text:#042C53;
+  --run-bg:#FAECE7;--run-text:#4A1B0C;
+  --track-bg:#FBEAF0;--track-text:#4B1528;
+  --str-bg:#EEEDFE;--str-text:#26215C;
+  --accent:#D85A30;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh;max-width:480px;margin:0 auto}
+
+/* NAV */
+.nav{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+.nav-left{display:flex;align-items:center;gap:8px}
+.logo{width:26px;height:26px;border-radius:6px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:white;font-size:9px;font-weight:700}
+.nav-title{font-size:14px;font-weight:600;color:var(--text)}
+.nav-sub{font-size:11px;color:var(--text3);margin-top:1px}
+.ava{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;flex-shrink:0}
+
+/* TABS */
+.tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);padding:0 12px}
+.tab{flex:1;padding:11px 0;font-size:12px;font-weight:500;border:none;background:transparent;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s}
+.tab.on{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* VIEWS */
+.view{display:none;padding:16px}
+.view.on{display:block}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+.card-title{font-size:12px;font-weight:600;color:var(--text);margin-bottom:10px}
+
+/* METRIC ROW */
+.mrow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+.mc{background:var(--surface2);border-radius:8px;padding:11px 10px;text-align:center}
+.mc-val{font-size:18px;font-weight:700;color:var(--text)}
+.mc-label{font-size:10px;color:var(--text2);margin-top:2px}
+
+/* TODAY HERO */
+.today-hero{background:var(--surface);border:2px solid var(--accent);border-radius:14px;padding:16px;margin-bottom:14px}
+.today-label{font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.today-title{font-size:18px;font-weight:700;color:var(--text);margin-bottom:3px}
+.today-meta{font-size:12px;color:var(--text2);margin-bottom:12px}
+.today-pills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+
+/* SESSION PILLS */
+.pill{display:inline-block;font-size:10px;padding:3px 9px;border-radius:5px;font-weight:600}
+.pill-swim{background:var(--swim-bg);color:var(--swim-text)}
+.pill-bike{background:var(--bike-bg);color:var(--bike-text)}
+.pill-run{background:var(--run-bg);color:var(--run-text)}
+.pill-track{background:var(--track-bg);color:var(--track-text)}
+.pill-str{background:var(--str-bg);color:var(--str-text)}
+.pill-gray{background:var(--surface2);color:var(--text2)}
+
+/* INTERVAL TABLE */
+.itbl{width:100%;border-collapse:collapse;font-size:12px;overflow-x:auto;display:block}
+.itbl th{text-align:left;padding:5px 7px;font-size:10px;color:var(--text2);font-weight:600;border-bottom:1px solid var(--border);white-space:nowrap}
+.itbl td{padding:7px 7px;border-bottom:1px solid var(--border);color:var(--text);white-space:nowrap}
+.itbl tr:last-child td{border-bottom:none}
+.zb{padding:2px 6px;border-radius:4px;font-size:10px;font-weight:600}
+.z1{background:var(--swim-bg);color:var(--swim-text)}.z2{background:var(--bike-bg);color:var(--bike-text)}.z3{background:#FAEEDA;color:#412402}.z4{background:var(--run-bg);color:var(--run-text)}.z5{background:var(--track-bg);color:var(--track-text)}
+
+/* WEEK LIST */
+.day-item{padding:11px 0;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:10px;cursor:pointer}
+.day-item:last-child{border-bottom:none}
+.day-item.today-item .day-date{color:var(--accent)}
+.day-date-wrap{width:36px;text-align:center;flex-shrink:0;padding-top:2px}
+.day-dow{font-size:9px;color:var(--text3);text-transform:uppercase;font-weight:600}
+.day-date{font-size:16px;font-weight:700;color:var(--text);margin-top:1px}
+.day-sessions{flex:1;display:flex;flex-direction:column;gap:5px}
+.sess-row{display:flex;align-items:center;gap:7px}
+.sess-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.sess-name{font-size:12px;font-weight:500;color:var(--text)}
+.sess-dur{font-size:11px;color:var(--text3);margin-left:auto}
+.rest-text{font-size:12px;color:var(--text3);padding-top:3px}
+.chevron{font-size:14px;color:var(--text3);margin-left:4px;align-self:center}
+
+/* SESSION DETAIL */
+.sess-detail{background:var(--surface2);border-radius:10px;padding:12px;margin-top:6px;display:none}
+.sess-detail.open{display:block}
+
+/* RPE LOG */
+.rpe-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:10px 0}
+.rpe-btn{padding:9px 4px;font-size:13px;font-weight:600;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;text-align:center;transition:all .15s}
+.rpe-btn.sel{border-color:var(--accent);background:var(--run-bg);color:var(--run-text)}
+.rpe-btn:hover{background:var(--surface2)}
+.rpe-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-bottom:4px;padding:0 2px}
+
+/* BUTTONS */
+.btn-accent{width:100%;padding:12px;font-size:13px;font-weight:600;border-radius:10px;border:none;background:var(--accent);color:white;cursor:pointer;transition:opacity .15s;margin-top:6px}
+.btn-accent:hover{opacity:.88}
+.btn-accent:active{opacity:.75}
+.btn{width:100%;padding:11px;font-size:12px;font-weight:500;border-radius:10px;border:1px solid var(--border2);background:var(--surface);color:var(--text);cursor:pointer;margin-top:6px}
+.btn:hover{background:var(--surface2)}
+
+/* FORMS */
+select,textarea{font-family:inherit;font-size:13px;color:var(--text);background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:9px 11px;width:100%;outline:none;margin-top:6px}
+textarea{resize:vertical;min-height:80px}
+label{font-size:11px;color:var(--text2);font-weight:500;display:block;margin-top:12px}
+
+/* PROGRESS BARS */
+.prog-row{margin-bottom:10px}
+.prog-label{display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:4px}
+.prog-bg{height:7px;background:var(--surface2);border-radius:4px;overflow:hidden}
+.prog-fill{height:7px;border-radius:4px}
+
+/* NOTES FEED */
+.note-item{padding:10px 0;border-bottom:1px solid var(--border)}
+.note-item:last-child{border-bottom:none}
+.note-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.note-sess{font-size:12px;font-weight:600;color:var(--text)}
+.note-date{font-size:11px;color:var(--text3)}
+.note-rpe{font-size:11px;color:var(--text2)}
+.note-body{font-size:12px;color:var(--text2);line-height:1.5;margin-top:3px}
+
+/* ATHLETE SELECTOR */
+.ath-select-wrap{padding:16px;background:var(--surface);border-bottom:1px solid var(--border)}
+.ath-select-label{font-size:11px;color:var(--text2);font-weight:500;margin-bottom:6px}
+.ath-chips{display:flex;gap:6px;flex-wrap:wrap}
+.ath-chip{padding:6px 12px;font-size:12px;font-weight:500;border-radius:20px;border:1px solid var(--border2);background:var(--surface);color:var(--text2);cursor:pointer;transition:all .15s}
+.ath-chip.sel{background:var(--accent);color:white;border-color:var(--accent)}
+
+/* UPCOMING RACE */
+.race-banner{background:var(--run-bg);border-radius:12px;padding:14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+.race-info .race-name{font-size:13px;font-weight:700;color:var(--run-text)}
+.race-info .race-date{font-size:11px;color:#712B13;margin-top:2px}
+.race-countdown{text-align:right}
+.race-countdown .days{font-size:22px;font-weight:700;color:var(--run-text)}
+.race-countdown .days-label{font-size:10px;color:#712B13;margin-top:1px}
+
+/* FEEDBACK SUCCESS */
+.success-msg{background:#E1F5EE;border-radius:8px;padding:10px 12px;font-size:12px;color:#085041;font-weight:500;margin-top:8px;display:none}
+.success-msg.show{display:block}
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <div class="nav-left">
+    <div class="logo">AC</div>
+    <div>
+      <div class="nav-title">Adamo Crew</div>
+      <div class="nav-sub" id="nav-sub">My training plan</div>
+    </div>
+  </div>
+  <div class="ava" id="nav-ava" style="background:#D85A30">JC</div>
+</div>
+
+<!-- ATHLETE SELECTOR -->
+<div class="ath-select-wrap">
+  <div class="ath-select-label">Viewing as</div>
+  <div class="ath-chips" id="ath-chips"></div>
+</div>
+
+<div class="tabs">
+  <button class="tab on" onclick="sw('week')">This week</button>
+  <button class="tab" onclick="sw('today')">Today</button>
+  <button class="tab" onclick="sw('log')">Log RPE</button>
+  <button class="tab" onclick="sw('stats')">My stats</button>
+</div>
+
+<!-- ===== THIS WEEK ===== -->
+<div id="v-week" class="view on">
+  <div class="race-banner">
+    <div class="race-info">
+      <div class="race-name">Los Cabos 70.3</div>
+      <div class="race-date">Sun, May 11 · Cabo San Lucas</div>
+    </div>
+    <div class="race-countdown">
+      <div class="days" id="days-out">—</div>
+      <div class="days-label">days to go</div>
+    </div>
+  </div>
+
+  <div class="mrow">
+    <div class="mc"><div class="mc-val" id="w-tss">—</div><div class="mc-label">TSS target</div></div>
+    <div class="mc"><div class="mc-val" id="w-hrs">—</div><div class="mc-label">Hours</div></div>
+    <div class="mc"><div class="mc-val" id="w-sess">—</div><div class="mc-label">Sessions</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="week-range-label">Week of —</div>
+    <div id="week-list"></div>
+  </div>
+</div>
+
+<!-- ===== TODAY ===== -->
+<div id="v-today" class="view">
+  <div id="today-content"></div>
+</div>
+
+<!-- ===== LOG RPE ===== -->
+<div id="v-log" class="view">
+  <div class="card">
+    <div class="card-title">Log session feedback</div>
+    <label>Session</label>
+    <select id="log-sess"></select>
+    <label>How hard was it? (RPE)</label>
+    <div class="rpe-labels"><span>Easy</span><span>Moderate</span><span>Max</span></div>
+    <div class="rpe-grid" id="rpe-grid"></div>
+    <label>Notes for your coach</label>
+    <textarea id="log-notes" placeholder="How did it feel? Any issues, niggles, highlights..."></textarea>
+    <button class="btn-accent" onclick="submitLog()">Send to coach</button>
+    <div class="success-msg" id="log-success">Sent! Jordi will see this in the coach dashboard.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">My recent logs</div>
+    <div id="log-history"></div>
+  </div>
+</div>
+
+<!-- ===== STATS ===== -->
+<div id="v-stats" class="view">
+  <div class="mrow">
+    <div class="mc"><div class="mc-val" id="s-ctl">—</div><div class="mc-label">CTL fitness</div></div>
+    <div class="mc"><div class="mc-val" id="s-atl">—</div><div class="mc-label">ATL fatigue</div></div>
+    <div class="mc"><div class="mc-val" id="s-tsb">—</div><div class="mc-label">TSB form</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">4-week load trend</div>
+    <div id="load-trend"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Sport breakdown this week</div>
+    <div id="sport-breakdown"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Phase & race countdown</div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.6" id="phase-text"></div>
+  </div>
+</div>
+
+<script>
+const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const now=new Date();
+const mon=new Date(now);
+mon.setDate(now.getDate()-(now.getDay()===0?6:now.getDay()-1));
+const todayDow=now.getDay()===0?6:now.getDay()-1;
+
+function wDate(offset){const d=new Date(mon);d.setDate(mon.getDate()+offset);return d;}
+function fmt(d){return MONTHS[d.getMonth()]+' '+d.getDate();}
+
+const RACE_DATE=new Date('2026-05-11');
+const daysOut=Math.ceil((RACE_DATE-now)/(1000*60*60*24));
+
+const athletes=[
+  {id:'jordi',name:'Jordi C.',ini:'JC',color:'#D85A30',ctl:72,atl:88,tsb:-16,tss:480,hrs:'11.5h',sports:[{l:'Bike',v:155,c:'#378ADD'},{l:'Run',v:70,c:'#D85A30'},{l:'Swim',v:105,c:'#1D9E75'},{l:'Track',v:75,c:'#D4537E'},{l:'Strength',v:20,c:'#7F77DD'}]},
+  {id:'lucrecia',name:'Lucrecia B.',ini:'LB',color:'#1D9E75',ctl:55,atl:62,tsb:-7,tss:312,hrs:'8h',sports:[{l:'Track',v:130,c:'#D4537E'},{l:'Run',v:120,c:'#D85A30'},{l:'Strength',v:30,c:'#7F77DD'}]},
+  {id:'ana',name:'Ana M.',ini:'AM',color:'#378ADD',ctl:61,atl:70,tsb:-9,tss:398,hrs:'9.5h',sports:[{l:'Swim',v:120,c:'#1D9E75'},{l:'Bike',v:160,c:'#378ADD'},{l:'Run',v:80,c:'#D85A30'},{l:'Strength',v:20,c:'#7F77DD'}]},
+  {id:'sofia',name:'Sofía V.',ini:'SV',color:'#D4537E',ctl:58,atl:66,tsb:-8,tss:340,hrs:'8.5h',sports:[{l:'Run',v:260,c:'#D85A30'},{l:'Strength',v:40,c:'#7F77DD'}]},
+  {id:'carlos',name:'Carlos R.',ini:'CR',color:'#7F77DD',ctl:48,atl:52,tsb:-4,tss:280,hrs:'7h',sports:[{l:'Bike',v:240,c:'#378ADD'},{l:'Strength',v:30,c:'#7F77DD'}]},
+  {id:'miguel',name:'Miguel A.',ini:'MA',color:'#888780',ctl:41,atl:46,tsb:-5,tss:220,hrs:'6h',sports:[{l:'Swim',v:80,c:'#1D9E75'},{l:'Bike',v:90,c:'#378ADD'},{l:'Run',v:40,c:'#D85A30'}]},
+];
+
+const planByAthlete={
+  jordi:[
+    {day:0,type:'swim',cls:'pill-swim',dot:'#1D9E75',label:'OWS base',dur:'45 min',tss:35,intervals:[{set:'Warm-up',reps:'1×400m',pace:'easy',zone:'z1',rest:'—'},{set:'Main',reps:'4×200m',pace:'1:55/100m',zone:'z3',rest:'30s'},{set:'Pull',reps:'4×100m',pace:'1:50/100m',zone:'z3',rest:'20s'},{set:'Cool-down',reps:'200m',pace:'easy',zone:'z1',rest:'—'}]},
+    {day:0,type:'strength',cls:'pill-str',dot:'#7F77DD',label:'Core & mobility',dur:'30 min',tss:20,intervals:[{set:'Plank circuit',reps:'3×60s',pace:'—',zone:'z1',rest:'30s'},{set:'Single-leg',reps:'3×12',pace:'—',zone:'z2',rest:'45s'}]},
+    {day:1,type:'bike',cls:'pill-bike',dot:'#378ADD',label:'Tempo intervals',dur:'1h 30min',tss:90,intervals:[{set:'Warm-up',reps:'20 min',pace:'<180w',zone:'z1',rest:'—'},{set:'Threshold',reps:'3×12 min',pace:'215–220w',zone:'z4',rest:'5 min'},{set:'Cool-down',reps:'15 min',pace:'<170w',zone:'z1',rest:'—'}]},
+    {day:2,type:'run',cls:'pill-run',dot:'#D85A30',label:'Easy aerobic',dur:'50 min',tss:45,intervals:[{set:'Easy run',reps:'50 min',pace:'5:00–5:20/km',zone:'z2',rest:'—'}]},
+    {day:2,type:'swim',cls:'pill-swim',dot:'#1D9E75',label:'Pool technique',dur:'1h',tss:40,intervals:[{set:'Drills',reps:'6×50m',pace:'form',zone:'z1',rest:'20s'},{set:'Pace work',reps:'10×100m',pace:'1:52/100m',zone:'z3',rest:'25s'}]},
+    {day:3,type:'track',cls:'pill-track',dot:'#D4537E',label:'800m speed endurance',dur:'1h 10min',tss:75,intervals:[{set:'Warm-up',reps:'2km',pace:'5:00/km',zone:'z1',rest:'—'},{set:'600m reps',reps:'4×600m',pace:'2:30–2:35',zone:'z5',rest:'3 min'},{set:'400m float',reps:'4×400m',pace:'1:50–1:55',zone:'z4',rest:'2 min'},{set:'Cool-down',reps:'1.5km',pace:'easy',zone:'z1',rest:'—'}]},
+    {day:4,type:'swim',cls:'pill-swim',dot:'#1D9E75',label:'OWS — Valle de Bravo',dur:'40 min',tss:30,intervals:[{set:'Steady',reps:'2×750m',pace:'1:55/100m',zone:'z2',rest:'2 min'},{set:'Race pace',reps:'2×250m',pace:'1:50/100m',zone:'z3',rest:'90s'}]},
+    {day:5,type:'bike',cls:'pill-bike',dot:'#378ADD',label:'Long ride + brick',dur:'3h 30min',tss:155,intervals:[{set:'Aerobic',reps:'90 min',pace:'185–200w',zone:'z2',rest:'—'},{set:'Race pace',reps:'60 min',pace:'215–220w',zone:'z3',rest:'—'},{set:'Brick run',reps:'20 min',pace:'4:20–4:30/km',zone:'z3',rest:'—'}]},
+    {day:6,type:'run',cls:'pill-run',dot:'#D85A30',label:'Long run (heat)',dur:'1h 20min',tss:70,intervals:[{set:'Warm-up',reps:'15 min',pace:'5:20/km',zone:'z1',rest:'—'},{set:'Steady',reps:'50 min',pace:'4:40–5:00/km',zone:'z2',rest:'—'},{set:'Cool-down',reps:'15 min',pace:'easy',zone:'z1',rest:'—'}]},
+  ],
+  lucrecia:[
+    {day:0,type:'run',cls:'pill-run',dot:'#D85A30',label:'Easy recovery run',dur:'40 min',tss:30,intervals:[{set:'Easy jog',reps:'40 min',pace:'5:30–5:50/km',zone:'z1',rest:'—'}]},
+    {day:1,type:'track',cls:'pill-track',dot:'#D4537E',label:'400m speed work',dur:'1h',tss:65,intervals:[{set:'Warm-up',reps:'2km',pace:'5:10/km',zone:'z1',rest:'—'},{set:'400m reps',reps:'8×400m',pace:'1:38–1:42',zone:'z5',rest:'2 min'},{set:'Cool-down',reps:'1km',pace:'easy',zone:'z1',rest:'—'}]},
+    {day:2,type:'run',cls:'pill-run',dot:'#D85A30',label:'Aerobic run',dur:'50 min',tss:42,intervals:[{set:'Steady',reps:'50 min',pace:'5:00–5:15/km',zone:'z2',rest:'—'}]},
+    {day:3,type:'track',cls:'pill-track',dot:'#D4537E',label:'800m race simulation',dur:'1h 15min',tss:80,intervals:[{set:'Warm-up',reps:'2km',pace:'5:00/km',zone:'z1',rest:'—'},{set:'800m time trial',reps:'2×800m',pace:'2:55–3:00',zone:'z5',rest:'10 min'},{set:'1200m tempo',reps:'2×1200m',pace:'4:30/km',zone:'z4',rest:'4 min'},{set:'Cool-down',reps:'1km',pace:'easy',zone:'z1',rest:'—'}]},
+    {day:4,type:'strength',cls:'pill-str',dot:'#7F77DD',label:'Strength & mobility',dur:'45 min',tss:25,intervals:[{set:'Hip circuit',reps:'3×15',pace:'—',zone:'z1',rest:'30s'},{set:'Plyometrics',reps:'3×10',pace:'—',zone:'z2',rest:'45s'},{set:'Core',reps:'3×60s',pace:'—',zone:'z1',rest:'30s'}]},
+    {day:5,type:'run',cls:'pill-run',dot:'#D85A30',label:'Long run',dur:'1h 10min',tss:60,intervals:[{set:'Easy start',reps:'15 min',pace:'5:20/km',zone:'z1',rest:'—'},{set:'Progression',reps:'40 min',pace:'4:50→4:30/km',zone:'z2',rest:'—'},{set:'Cool-down',reps:'15 min',pace:'easy',zone:'z1',rest:'—'}]},
+  ],
+  ana:[
+    {day:0,type:'swim',cls:'pill-swim',dot:'#1D9E75',label:'OWS — Valle de Bravo',dur:'45 min',tss:35,intervals:[{set:'Steady',reps:'2×800m',pace:'1:58/100m',zone:'z2',rest:'2 min'},{set:'Pace',reps:'4×100m',pace:'1:52/100m',zone:'z3',rest:'30s'}]},
+    {day:1,type:'bike',cls:'pill-bike',dot:'#378ADD',label:'Endurance ride',dur:'1h 45min',tss:95,intervals:[{set:'Warm-up',reps:'15 min',pace:'<170w',zone:'z1',rest:'—'},{set:'Steady',reps:'75 min',pace:'190–200w',zone:'z3',rest:'—'},{set:'Cool-down',reps:'15 min',pace:'easy',zone:'z1',rest:'—'}]},
+    {day:2,type:'run',cls:'pill-run',dot:'#D85A30',label:'Easy brick run',dur:'30 min',tss:28,intervals:[{set:'Easy run',reps:'30 min',pace:'5:10–5:30/km',zone:'z2',rest:'—'}]},
+    {day:3,type:'swim',cls:'pill-swim',dot:'#1D9E75',label:'Pool intervals',dur:'1h',tss:42,intervals:[{set:'Drills',reps:'400m',pace:'form',zone:'z1',rest:'—'},{set:'Threshold',reps:'8×100m',pace:'1:50/100m',zone:'z4',rest:'20s'},{set:'Cool-down',reps:'200m',pace:'easy',zone:'z1',rest:'—'}]},
+    {day:4,type:'strength',cls:'pill-str',dot:'#7F77DD',label:'Core & stability',dur:'40 min',tss:22,intervals:[{set:'Plank work',reps:'4×45s',pace:'—',zone:'z1',rest:'30s'},{set:'Hip stability',reps:'3×12',pace:'—',zone:'z2',rest:'45s'}]},
+    {day:5,type:'bike',cls:'pill-bike',dot:'#378ADD',label:'Long ride',dur:'2h 30min',tss:120,intervals:[{set:'Aerobic',reps:'2h',pace:'185–195w',zone:'z2',rest:'—'},{set:'Race effort',reps:'30 min',pace:'200–210w',zone:'z3',rest:'—'}]},
+    {day:6,type:'run',cls:'pill-run',dot:'#D85A30',label:'Long run',dur:'1h',tss:56,intervals:[{set:'Easy',reps:'15 min',pace:'5:20/km',zone:'z1',rest:'—'},{set:'Steady',reps:'35 min',pace:'4:50–5:00/km',zone:'z2',rest:'—'},{set:'Cool-down',reps:'10 min',pace:'easy',zone:'z1',rest:'—'}]},
+  ],
+  sofia:[
+    {day:1,type:'run',cls:'pill-run',dot:'#D85A30',label:'Tempo run',dur:'55 min',tss:58,intervals:[{set:'Warm-up',reps:'10 min',pace:'5:20/km',zone:'z1',rest:'—'},{set:'Tempo',reps:'30 min',pace:'4:20–4:30/km',zone:'z3',rest:'—'},{set:'Cool-down',reps:'15 min',pace:'easy',zone:'z1',rest:'—'}]},
+    {day:2,type:'run',cls:'pill-run',dot:'#D85A30',label:'Easy recovery',dur:'40 min',tss:32,intervals:[{set:'Easy jog',reps:'40 min',pace:'5:30/km',zone:'z1',rest:'—'}]},
+    {day:3,type:'strength',cls:'pill-str',dot:'#7F77DD',label:'Strength',dur:'45 min',tss:25,intervals:[{set:'Lower body',reps:'3×12',pace:'—',zone:'z2',rest:'60s'},{set:'Core',reps:'3×45s',pace:'—',zone:'z1',rest:'30s'}]},
+    {day:4,type:'run',cls:'pill-run',dot:'#D85A30',label:'Intervals',dur:'1h',tss:70,intervals:[{set:'Warm-up',reps:'15 min',pace:'5:15/km',zone:'z1',rest:'—'},{set:'1km reps',reps:'5×1km',pace:'3:55–4:00/km',zone:'z4',rest:'90s'},{set:'Cool-down',reps:'10 min',pace:'easy',zone:'z1',rest:'—'}]},
+    {day:6,type:'run',cls:'pill-run',dot:'#D85A30',label:'Long run',dur:'1h 40min',tss:95,intervals:[{set:'Easy',reps:'20 min',pace:'5:20/km',zone:'z1',rest:'—'},{set:'Steady',reps:'70 min',pace:'4:45–5:00/km',zone:'z2',rest:'—'},{set:'Cool-down',reps:'10 min',pace:'easy',zone:'z1',rest:'—'}]},
+  ],
+  carlos:[
+    {day:0,type:'bike',cls:'pill-bike',dot:'#378ADD',label:'Recovery spin',dur:'1h',tss:40,intervals:[{set:'Easy spin',reps:'60 min',pace:'<160w',zone:'z1',rest:'—'}]},
+    {day:2,type:'bike',cls:'pill-bike',dot:'#378ADD',label:'Threshold work',dur:'1h 30min',tss:90,intervals:[{set:'Warm-up',reps:'20 min',pace:'<180w',zone:'z1',rest:'—'},{set:'Threshold',reps:'3×10 min',pace:'240–250w',zone:'z4',rest:'5 min'},{set:'Cool-down',reps:'15 min',pace:'easy',zone:'z1',rest:'—'}]},
+    {day:3,type:'strength',cls:'pill-str',dot:'#7F77DD',label:'Gym — legs',dur:'45 min',tss:30,intervals:[{set:'Squats',reps:'4×8',pace:'—',zone:'z2',rest:'90s'},{set:'Lunges',reps:'3×12',pace:'—',zone:'z2',rest:'60s'}]},
+    {day:5,type:'bike',cls:'pill-bike',dot:'#378ADD',label:'Long endurance ride',dur:'3h',tss:130,intervals:[{set:'Aerobic',reps:'2h',pace:'200–215w',zone:'z2',rest:'—'},{set:'Tempo',reps:'45 min',pace:'230–240w',zone:'z3',rest:'—'},{set:'Cool-down',reps:'15 min',pace:'easy',zone:'z1',rest:'—'}]},
+  ],
+  miguel:[
+    {day:0,type:'swim',cls:'pill-swim',dot:'#1D9E75',label:'Pool — technique',dur:'45 min',tss:30,intervals:[{set:'Drills',reps:'400m',pace:'form',zone:'z1',rest:'—'},{set:'Steady',reps:'6×100m',pace:'1:58/100m',zone:'z2',rest:'30s'}]},
+    {day:2,type:'bike',cls:'pill-bike',dot:'#378ADD',label:'Endurance ride',dur:'1h 15min',tss:60,intervals:[{set:'Steady',reps:'75 min',pace:'175–185w',zone:'z2',rest:'—'}]},
+    {day:4,type:'run',cls:'pill-run',dot:'#D85A30',label:'Easy run',dur:'35 min',tss:28,intervals:[{set:'Easy jog',reps:'35 min',pace:'5:20–5:40/km',zone:'z2',rest:'—'}]},
+    {day:5,type:'bike',cls:'pill-bike',dot:'#378ADD',label:'Long ride + brick',dur:'2h',tss:90,intervals:[{set:'Aerobic',reps:'90 min',pace:'175–185w',zone:'z2',rest:'—'},{set:'Brick run',reps:'15 min',pace:'5:00/km',zone:'z2',rest:'—'}]},
+  ],
+};
+
+const logsByAthlete={
+  jordi:[
+    {sess:'Bike tempo',date:'Apr 1',rpe:8,notes:'Legs heavy early, came around after 30 min. Hit all 3 intervals at 217–219w.'},
+    {sess:'Long run (heat)',date:'Mar 30',rpe:7,notes:'31°C. Held 4:48/km. HR crept up last 20 min.'},
+  ],
+  lucrecia:[
+    {sess:'800m race simulation',date:'Mar 31',rpe:9,notes:'600s at 2:28–2:31. Felt strong. Wanted more.'},
+  ],
+  ana:[
+    {sess:'OWS — Valle de Bravo',date:'Mar 30',rpe:6,notes:'First OWS in 3 weeks. Sighting improved. Breathing labored first 400m.'},
+  ],
+  sofia:[],carlos:[],miguel:[],
+};
+
+let curAth='jordi';
+let selRPE=null;
+
+function getAth(){return athletes.find(a=>a.id===curAth);}
+function getPlan(){return planByAthlete[curAth]||[];}
+function getLogs(){return logsByAthlete[curAth]||[];}
+
+function buildAthleteChips(){
+  const c=document.getElementById('ath-chips');
+  athletes.forEach(a=>{
+    const b=document.createElement('button');
+    b.className='ath-chip'+(a.id===curAth?' sel':'');
+    b.textContent=a.name.split(' ')[0];
+    b.onclick=()=>{curAth=a.id;render();};
+    c.appendChild(b);
+  });
+}
+
+function render(){
+  // Update chips
+  document.querySelectorAll('.ath-chip').forEach((b,i)=>{
+    b.classList.toggle('sel',athletes[i].id===curAth);
+  });
+  const a=getAth();
+  // Nav
+  document.getElementById('nav-ava').textContent=a.ini;
+  document.getElementById('nav-ava').style.background=a.color;
+  document.getElementById('nav-sub').textContent=a.name;
+  // Race countdown
+  document.getElementById('days-out').textContent=daysOut;
+  // Week stats
+  const plan=getPlan();
+  document.getElementById('w-tss').textContent=a.tss;
+  document.getElementById('w-hrs').textContent=a.hrs;
+  document.getElementById('w-sess').textContent=plan.length;
+  // Week range
+  const sun=wDate(6);
+  document.getElementById('week-range-label').textContent=fmt(mon)+' – '+fmt(sun);
+  // Week list
+  buildWeekList();
+  // Today
+  buildToday();
+  // Log
+  buildLog();
+  // Stats
+  buildStats();
+}
+
+function buildWeekList(){
+  const wl=document.getElementById('week-list');
+  wl.innerHTML='';
+  const plan=getPlan();
+  const DOWS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  for(let i=0;i<7;i++){
+    const sessions=plan.filter(s=>s.day===i);
+    const d=wDate(i);
+    const isToday=i===todayDow;
+    const item=document.createElement('div');
+    item.className='day-item'+(isToday?' today-item':'');
+    let html=`<div class="day-date-wrap"><div class="day-dow">${DOWS[i]}</div><div class="day-date">${d.getDate()}</div></div><div class="day-sessions">`;
+    if(!sessions.length){
+      html+=`<div class="rest-text">Rest day</div>`;
+    } else {
+      sessions.forEach((s,si)=>{
+        html+=`<div class="sess-row" onclick="toggleDetail('d-${i}-${si}')">
+          <div class="sess-dot" style="background:${s.dot}"></div>
+          <div class="sess-name">${s.label}</div>
+          <div class="sess-dur">${s.dur}</div>
+        </div>
+        <div class="sess-detail" id="d-${i}-${si}">
+          <table class="itbl">
+            <thead><tr><th>Set</th><th>Reps</th><th>Pace/power</th><th>Zone</th><th>Rest</th></tr></thead>
+            <tbody>${s.intervals.map(r=>`<tr><td>${r.set}</td><td>${r.reps}</td><td>${r.pace}</td><td><span class="zb ${r.zone}">${r.zone.toUpperCase()}</span></td><td>${r.rest}</td></tr>`).join('')}</tbody>
+          </table>
+        </div>`;
+      });
+    }
+    html+='</div>';
+    if(sessions.length) html+=`<div class="chevron">›</div>`;
+    item.innerHTML=html;
+    wl.appendChild(item);
+  }
+}
+
+function toggleDetail(id){
+  const el=document.getElementById(id);
+  if(el) el.classList.toggle('open');
+}
+
+function buildToday(){
+  const tc=document.getElementById('today-content');
+  const plan=getPlan();
+  const todaySessions=plan.filter(s=>s.day===todayDow);
+  const d=wDate(todayDow);
+  if(!todaySessions.length){
+    tc.innerHTML=`<div style="padding:32px 16px;text-align:center">
+      <div style="font-size:32px;margin-bottom:12px">🌿</div>
+      <div style="font-size:16px;font-weight:600;color:var(--text);margin-bottom:6px">Rest day</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.6">Today is a recovery day. Use it well — sleep, nutrition, and mobility matter as much as training.</div>
+    </div>`;
+    return;
+  }
+  let html=`<div style="font-size:11px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Today · ${fmt(d)}</div>`;
+  todaySessions.forEach(s=>{
+    html+=`<div class="today-hero">
+      <div class="today-label">${s.type}</div>
+      <div class="today-title">${s.label}</div>
+      <div class="today-meta">${s.dur} · ${s.tss} TSS</div>
+      <div class="today-pills"><span class="pill ${s.cls}">${s.type}</span><span class="pill pill-gray">${s.dur}</span><span class="pill pill-gray">${s.tss} TSS</span></div>
+      <table class="itbl">
+        <thead><tr><th>Set</th><th>Reps</th><th>Pace/power</th><th>Zone</th><th>Rest</th></tr></thead>
+        <tbody>${s.intervals.map(r=>`<tr><td>${r.set}</td><td>${r.reps}</td><td>${r.pace}</td><td><span class="zb ${r.zone}">${r.zone.toUpperCase()}</span></td><td>${r.rest}</td></tr>`).join('')}</tbody>
+      </table>
+    </div>`;
+  });
+  html+=`<button class="btn-accent" onclick="sw('log')">Log RPE after session</button>`;
+  tc.innerHTML=html;
+}
+
+function buildLog(){
+  // Session select
+  const sel=document.getElementById('log-sess');
+  sel.innerHTML='';
+  const plan=getPlan();
+  const DOWS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  plan.forEach(s=>{
+    const opt=document.createElement('option');
+    opt.value=s.label;
+    opt.textContent=DOWS[s.day]+' — '+s.label;
+    sel.appendChild(opt);
+  });
+  // RPE grid
+  const grid=document.getElementById('rpe-grid');
+  grid.innerHTML='';
+  for(let i=1;i<=10;i++){
+    const b=document.createElement('button');
+    b.className='rpe-btn'+(selRPE===i?' sel':'');
+    b.textContent=i;
+    b.onclick=()=>{selRPE=i;document.querySelectorAll('.rpe-btn').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');};
+    grid.appendChild(b);
+  }
+  // Log history
+  renderLogHistory();
+}
+
+function renderLogHistory(){
+  const logs=getLogs();
+  const h=document.getElementById('log-history');
+  if(!logs.length){h.innerHTML='<div style="font-size:12px;color:var(--text3);padding:8px 0">No logs yet. Complete a session and log your RPE above.</div>';return;}
+  h.innerHTML=logs.map(l=>`<div class="note-item">
+    <div class="note-header"><span class="note-sess">${l.sess}</span><span class="note-date">${l.date}</span></div>
+    <div class="note-rpe">RPE <strong>${l.rpe}</strong>/10</div>
+    <div class="note-body">${l.notes}</div>
+  </div>`).join('');
+}
+
+function submitLog(){
+  const sess=document.getElementById('log-sess').value;
+  const notes=document.getElementById('log-notes').value.trim();
+  if(!notes){alert('Add some notes before sending.');return;}
+  const logs=logsByAthlete[curAth];
+  const today=fmt(now);
+  logs.unshift({sess,date:today,rpe:selRPE||'?',notes});
+  document.getElementById('log-notes').value='';
+  selRPE=null;
+  document.querySelectorAll('.rpe-btn').forEach(x=>x.classList.remove('sel'));
+  const msg=document.getElementById('log-success');
+  msg.classList.add('show');
+  setTimeout(()=>msg.classList.remove('show'),3000);
+  renderLogHistory();
+}
+
+function buildStats(){
+  const a=getAth();
+  document.getElementById('s-ctl').textContent=a.ctl;
+  document.getElementById('s-atl').textContent=a.atl;
+  document.getElementById('s-tsb').textContent=(a.tsb>0?'+':'')+a.tsb;
+  // Load trend (mock 4 weeks)
+  const weeks=[
+    {w:'W11',v:Math.round(a.tss*0.72)},
+    {w:'W12',v:Math.round(a.tss*0.88)},
+    {w:'W13',v:Math.round(a.tss*0.82)},
+    {w:'W14',v:a.tss},
+  ];
+  const mx=Math.max(...weeks.map(x=>x.v));
+  document.getElementById('load-trend').innerHTML=weeks.map(w=>{
+    const p=Math.round(w.v/mx*100);
+    const isCur=w.w==='W14';
+    return`<div class="prog-row">
+      <div class="prog-label"><span>${w.w}</span><span>${w.v} TSS</span></div>
+      <div class="prog-bg"><div class="prog-fill" style="width:${p}%;background:${isCur?'var(--accent)':'#ccc9be'}"></div></div>
+    </div>`;
+  }).join('');
+  // Sport breakdown
+  const tot=a.sports.reduce((s,x)=>s+x.v,0);
+  document.getElementById('sport-breakdown').innerHTML=a.sports.map(s=>{
+    const p=Math.round(s.v/tot*100);
+    return`<div class="prog-row">
+      <div class="prog-label"><span>${s.l}</span><span>${p}%</span></div>
+      <div class="prog-bg"><div class="prog-fill" style="width:${p}%;background:${s.c}"></div></div>
+    </div>`;
+  }).join('');
+  // Phase text
+  const tsb=a.tsb;
+  let form='building fitness';
+  if(tsb>5) form='fresh and ready';
+  else if(tsb>0) form='well balanced';
+  else if(tsb>-10) form='slight fatigue — normal';
+  else form='accumulated fatigue — absorbing load';
+  document.getElementById('phase-text').innerHTML=`
+    <strong>Phase:</strong> Build 2 · Los Cabos 70.3 build block<br>
+    <strong>Form status:</strong> ${form} (TSB ${(tsb>0?'+':'')+tsb})<br>
+    <strong>Race:</strong> Los Cabos 70.3 · May 11 · <strong>${daysOut} days away</strong><br><br>
+    <span style="color:var(--text3)">Peak weeks: Apr 8–21 · Taper starts: Apr 27 · Race week: May 5</span>
+  `;
+}
+
+function sw(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('v-'+id).classList.add('on');
+  const map={week:0,today:1,log:2,stats:3};
+  document.querySelectorAll('.tab')[map[id]].classList.add('on');
+  window.scrollTo(0,0);
+}
+
+buildAthleteChips();
+render();
+</script>
+</body>
+</html>
